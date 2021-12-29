@@ -5,7 +5,8 @@ const User = mongoose.model(
   "User",
   new Schema({
     username: { type: String, required: true },
-    userId: {type: ID, required: true}
+	spotifyId: {type: String, required: true},
+	deviceId: { type: String }
   })
 );
 

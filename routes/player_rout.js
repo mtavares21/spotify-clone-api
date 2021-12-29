@@ -21,9 +21,12 @@ router.get("/next", player_ctrl.nextSong)
 router.get("/prev", player_ctrl.prevSong)
 
 // Seek To Position
-router.get("/prev", player_ctrl.seekTo)
+router.get("/seek", player_ctrl.seekTo)
 
-//Add Item to Playback Queue
-router.get("/prev", player_ctrl.addToQueue)
+// Add Item to Playback Queue
+router.get("/addToQueue", player_ctrl.addToQueue)
+
+// Set Playback Volume
+router.get("/volume", player_ctrl.setVolume)
 
 module.exports = router;

@@ -47,6 +47,7 @@ const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users_rout");
 const dataRouter = require("./routes/data_rout");
 const playerRouter = require("./routes/player_rout");
+const dbRouter = require("./routes/db_rout");
 
 
 //app.use(cookieParser())
@@ -65,6 +66,7 @@ app.use("/v1", indexRouter);
 app.use("/v1/data", dataRouter);
 app.use("/v1/users", usersRouter);
 app.use("/v1/player", playerRouter);
+app.use("/v1/db", dbRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
