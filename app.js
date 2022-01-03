@@ -39,7 +39,8 @@ app.use(session({
   },
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false, maxAge: 3600 },
+  //Same as spotify token: 1 hour
+  cookie: { secure: false, maxAge: 3600000 },
   store: mongoStore,
 }))
 

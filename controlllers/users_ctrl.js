@@ -64,7 +64,7 @@ exports.spotifyCallback = function (req, res, next) {
     .then((response) => {
 	// SAVE TOKEN TO SESSION
       req.session.token = response.data.access_token;
-	  req.session.refresh_token = response.data.refresh_token;
+	    req.session.refresh_token = response.data.refresh_token;
 	  debug(req.session)
       res.json(response.data);
     })

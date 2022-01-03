@@ -4,12 +4,13 @@ const utils = require("./utils");
 const debug = require("debug")("player_ctrl");
 const baseUrl = "https://api.spotify.com/v1/me";
 
-async function getPlayerState(req, next) {
+async function getPlayerState(req, res, next) {
   const endpoint = `/player`;
   const query = utils.queryToParams(req.query);
   const url = baseUrl + endpoint + query;
 
   debug("player: " + url);
+  debug("token: %O", req.session);
   // Set headers
   const headers = {
     Authorization: "Bearer " + req.session.token,
@@ -19,19 +20,20 @@ async function getPlayerState(req, next) {
   // Send request
   try {
     const response = await axios.get(url, { headers });
+    debug("response: %O", response)
     return response.data;
   } catch (error) {
-    utils.axiosErrorHandler("player_ctrl",error, next);
+    utils.axiosErrorHandler(res, "player_ctrl",error, next);
   }
 }
 // Get Playback State
 exports.playerState = async function (req, res, next) {
-  const state = await getPlayerState(req, next);
+  const state = await getPlayerState(req, res, next);
   debug(state);
   try {
-    res.json(state);
+    res.status(200).json(state);
   } catch (error) {
-    utils.axiosErrorHandler("player_ctrl",error, next);
+    utils.axiosErrorHandler(res, "player_ctrl",error, next);
   }
 };
 
@@ -51,10 +53,10 @@ exports.getCurrTrack = async function (req, res, next) {
   // Send request
   try {
     const response = await axios.get(url, { headers });
-    res.json(response.data);
+    res.status(200).json(response.data);
     debug("track_name:" + response.data.item.name);
   } catch (error) {
-    utils.axiosErrorHandler("player_ctrl",error, next);
+    utils.axiosErrorHandler(res, "player_ctrl",error, next);
   }
 };
 
@@ -65,7 +67,7 @@ exports.play = async function (req, res, next) {
   const device_id = query.device_id ? "?device_id=" +query.device_id : "";
   const url = baseUrl + endpoint + device_id;
   let contextUri = null;
-  let progress = "0";
+  let progress = query.progress ? query.progress : "0";
 
   debug("play: " + url);
   // Set headers
@@ -78,14 +80,14 @@ exports.play = async function (req, res, next) {
   debug("query.context!",query.contextUri)
   if (!!query.contextUri) contextUri = query.contextUri;
   else {
-    const state = await getPlayerState(req, next);
-    contextUri = state.context.uri;
+    const state = await getPlayerState(req,res, next);
+    contextUri = state.context ? state.context.uri : null;
     progress = state.progress_ms;
   }
 
   const data = {
     context_uri: contextUri,
-    position_ms: query.progress ? query.progress : progress,
+    position_ms: progress,
   };
 
   const offset = { position: 0 };
@@ -99,7 +101,7 @@ exports.play = async function (req, res, next) {
     res.status(200).end();
   } catch (error) {
 	debug("catch error")
-    utils.axiosErrorHandler("player_ctrl",error, next);
+    utils.axiosErrorHandler(res, "player_ctrl",error, next);
   }
 };
 // Pause Playback
@@ -120,7 +122,7 @@ exports.pause = async function (req, res, next) {
     const response = await axios.put(url,device_id,{ headers });
     res.status(200).end();
   } catch (error) {
-    utils.axiosErrorHandler("player_ctrl",error, next);
+    utils.axiosErrorHandler(res, "player_ctrl",error, next);
   }
 };
 
@@ -142,7 +144,7 @@ exports.nextSong = async function (req, res, next) {
     debug(response.data);
     res.status(200).end();
   } catch (error) {
-    utils.axiosErrorHandler("player_ctrl",error, next);
+    utils.axiosErrorHandler(res, "player_ctrl",error, next);
   }
 };
 
@@ -164,8 +166,7 @@ exports.prevSong = async function (req, res, next) {
     debug(response.data);
     res.status(200).end();
   } catch (error) {
-    utils.axiosErrorHandler("player_ctrl",error);
-    res.redirect("http://localhost:3000/v1/player/play");
+    utils.axiosErrorHandler(res,"player_ctrl",error, res.redirect("http://localhost:3000/v1/player/play"));
   }
 };
 
@@ -188,7 +189,7 @@ exports.seekTo = async function (req, res, next) {
 	const response = await axios.put(url,query, { headers });
     res.status(200).end();
   } catch (error) {
-    utils.axiosErrorHandler("player_ctrl",error, next);
+    utils.axiosErrorHandler(res, "player_ctrl",error, next);
   }
 };
 
@@ -211,7 +212,7 @@ exports.addToQueue = async function (req, res, next) {
 	  const response = await axios.post(url,query, {headers} );
 	  res.status(200).end();
 	} catch (error) {
-	  utils.axiosErrorHandler("player_ctrl",error, next);
+	  utils.axiosErrorHandler(res, "player_ctrl",error, next);
 	}
 };
 
@@ -235,6 +236,6 @@ exports.setVolume = async function (req, res, next){
 	try {
 	  res.status(200).end();
 	} catch (error) {
-	  utils.axiosErrorHandler("player_ctrl",error, next);
+	  utils.axiosErrorHandler(res, "player_ctrl",error, next);
 	}
 }

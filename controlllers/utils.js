@@ -14,7 +14,7 @@ exports.queryToParams = (query) => {
   return buffer;
 };
 
-exports.axiosErrorHandler = (file, error, next) => {
+exports.axiosErrorHandler = (res, file, error, next) => {
   if (error.response) {
     debug(file + " response_error_status: ", error.response.status);
     //debug("response headers: " + JSON.stringify(error.response.headers));
@@ -22,9 +22,12 @@ exports.axiosErrorHandler = (file, error, next) => {
       file + " response__error_message ",
       error.response.data.error.message
     );
+    res.status(error.response.status).json({status: error.response.status, message: error.response.data.error.message})
   } else if (error.request) {
     debug(file + " request_error: ", error.request);
-  } else debug(file + " error_message: ", error.message);
-
-  next ? next(error) : null;
+    res.status(404).json(error.request);
+  } else {
+    debug(file + " error_message: ", error.message);
+    res.status(400).json(error)
+  }
 };

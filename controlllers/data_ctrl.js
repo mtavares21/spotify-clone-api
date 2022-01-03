@@ -7,8 +7,7 @@ const baseUrl = "https://api.spotify.com/v1";
 /* ------------- SEARCH by, type, song, album, etc (ex: ?q=exile&type=album&limit=10) -------------- */
 exports.search = async function (req, res, next) {
   const endpoint = "/search";
-  const query = req.originalUrl.slice(req.originalUrl.indexOf("?q="));
-  const url = baseUrl + endpoint + query;
+  const url = baseUrl + endpoint + utils.queryToParams(req.query);
   const headers = {
     Authorization: "Bearer " + req.session.token,
     "Content-Type": "application/json",
@@ -19,7 +18,7 @@ exports.search = async function (req, res, next) {
     res.json(response.data);
   } catch (error) {
     debug(error);
-    next(error);
+    utils.axiosErrorHandler(res,"data_ctrl",error, next)
   }
 };
 
@@ -44,8 +43,7 @@ exports.getAlbum = async function (req, res, next) {
 		res.json(response.data);
 		debug(response.data.tracks.items.map( track => track.name))
   } catch (error) {
-    debug(error);
-    next(error);
+    utils.axiosErrorHandler(res,"data_ctrl",error, next)
   }
 };
 
@@ -70,8 +68,7 @@ exports.getAlbums = async function (req, res, next) {
 	  res.json(response.data);
 	  debug("getAlbums response:" + response.data)
 	} catch (error) {
-	  debug(error);
-	  next(error);
+		utils.axiosErrorHandler(res,"data_ctrl",error, next)
 	}
   };
 //GET album tracks
@@ -95,8 +92,7 @@ exports.getAlbumTracks = async function (req, res, next) {
 	  res.json(response.data);
 	  debug(response.data.items.map(track => track.name))
 	} catch (error) {
-	  debug(error);
-	  next(error);
+		utils.axiosErrorHandler(res,"data_ctrl",error, next)
 	}
   };
 /* ------------- ARTISTS -------------- */
@@ -120,8 +116,7 @@ exports.getArtist = async function (req, res, next) {
     res.json(response.data);
     debug("getArtist response.name: " + response.data.name);
   } catch (error) {
-    debug(error);
-    next(error);
+	utils.axiosErrorHandler(res,"data_ctrl",error, next)
   }
 };
 // GET artists
@@ -144,8 +139,7 @@ exports.getArtists = async function (req, res, next) {
     res.json(response.data);
     debug("getArtist response:" + response.data);
   } catch (error) {
-    debug(error);
-    next(error);
+    utils.axiosErrorHandler(res,"data_ctrl",error, next)
   }
 };
 // GET artists albums
@@ -172,8 +166,7 @@ try {
   res.json(response.data);
   debug(response.data.items.map((album, index) => index + " - " + album.name))
 } catch (error) {
-  debug(error);
-  next(error);
+	utils.axiosErrorHandler(res,"data_ctrl",error, next)
 }
   };
 /* ------------- TRACKS -------------- */
@@ -197,8 +190,7 @@ exports.getTrack = async function (req, res, next) {
 	  const response = await axios.get(url, { headers });
 	  res.json(response.data);
 	} catch (error) {
-	  debug(error);
-	  next(error);
+		utils.axiosErrorHandler(res,"data_ctrl",error, next)
 	}
   };
 // GET tracks
@@ -220,7 +212,6 @@ exports.getTracks = async function (req, res, next) {
 	  const response = await axios.get(url, { headers });
 	  res.json(response.data);
 	} catch (error) {
-	  debug(error);
-	  next(error);
+		utils.axiosErrorHandler(res,"data_ctrl",error, next);
 	}
   };
