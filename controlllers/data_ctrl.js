@@ -41,7 +41,6 @@ exports.getAlbum = async function (req, res, next) {
   try {
 	const response = await axios.get(url, { headers });
 		res.json(response.data);
-		debug(response.data.tracks.items.map( track => track.name))
   } catch (error) {
     utils.axiosErrorHandler(res,"data_ctrl",error, next)
   }
@@ -66,7 +65,6 @@ exports.getAlbums = async function (req, res, next) {
 	try {
 	  const response = await axios.get(url, { headers });
 	  res.json(response.data);
-	  debug("getAlbums response:" + response.data)
 	} catch (error) {
 		utils.axiosErrorHandler(res,"data_ctrl",error, next)
 	}

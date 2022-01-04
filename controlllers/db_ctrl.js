@@ -19,35 +19,22 @@ exports.createUser = async (req, res, next) => {
   if (createUser === null) res.json(`New user created.`);
 };
 
-exports.createAlbum = function (req, res, next) {
-  // Both return Promises
-  const createArtist = artistMethods(req.query.artists).createArtist();
-  createArtist
-    .then((resolve) => {
-      Album.exists()
-        .then((response) => {
-          if (!response) {
-            Album.createAlbum(
-              req.query.artists,
-              req.query.spotifyUrl,
-              req.query.name,
-              req.query.images,
-              req.query.totalTracks,
-              req.query.spotifyUri
-            )
-              .then((response) => res.status(200).json("New album created."))
-              .catch((error) =>
-                res
-                  .status(404)
-                  .json({ message: "Error accessing database.", error })
-              );
-          } else res.status(200).json("Album already exists.");
-        })
-        .catch((error) =>
-          res.status(404).json({ message: "Error accessing database.", error })
-        );
-    })
-    .catch((error) => {});
+exports.createAlbum = async function (req, res, next) {
+  const Album = await albumMethods(req.query.spotifyId);
+  debug("token: ", req.session.token);
+  Album.createAlbum(
+    req.session.token,
+    req.query.artists,
+    req.query.spotifyUrl,
+    req.query.name,
+    req.query.images.split(","),
+    req.query.totalTracks,
+    req.query.spotifyUri
+  )
+    .then((response) => res.status(200).json("New album created."))
+    .catch((error) => {
+      res.status(404).json({ message: "Error accessing database.", error });
+    });
 };
 
 exports.createArtist = (req, res, next) => {

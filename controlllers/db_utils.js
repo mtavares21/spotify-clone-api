@@ -120,7 +120,7 @@ exports.getFromDb = async (Model, req, res, handleError, debugMessage) => {
 
 exports.existsInDb = function (Model, spotifyId) {
   const response = new Promise((resolve, reject) => {
-    Artist.find({'spotifyId': spotifyId}).exec((err, artist) => {
+    Model.find({'spotifyId': spotifyId}).exec((err, artist) => {
     debug(artist)
       if (err) return reject(err);
       return resolve(!!artist.length);

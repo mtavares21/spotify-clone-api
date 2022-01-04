@@ -166,7 +166,7 @@ exports.prevSong = async function (req, res, next) {
     debug(response.data);
     res.status(200).end();
   } catch (error) {
-    utils.axiosErrorHandler(res,"player_ctrl",error, res.redirect("http://localhost:3000/v1/player/play"));
+    res.redirect("http://localhost:3000/v1/player/play");
   }
 };
 
