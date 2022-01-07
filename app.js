@@ -14,7 +14,7 @@ const MongoStore = require('connect-mongo');
 const mongoose = require("mongoose");
 
 //Set up default mongoose connection
-const mongoURL = process.env.DEV_DB;
+const mongoURL = process.env.DEV_DB || process.env.PRO_DB;
 mongoose.connect(mongoURL, { useNewUrlParser: true, useUnifiedTopology: true });
 debug("DATABASE_CONNECTION: ON")
 
