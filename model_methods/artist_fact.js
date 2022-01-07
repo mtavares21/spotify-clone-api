@@ -7,26 +7,29 @@ exports.artistMethods = function (spotifyId) {
     return dbUtils.existsInDb(Artist, spotifyId);
   }
 
-  async function createArtist(spotifyUrl, name, spotifyUri, images) {
+  async function createArtist({ spotifyUrl, name, spotifyUri, images }) {
     const getExistResult = async () => {
-      const result = await exists();
-      return result;
+      debug("getExistResult is called");
+      return await exists();
     };
 
     const saveFlow = async () => {
       try {
+        debug("artist saveFlow is called");
         const exist = await getExistResult();
         debug("1 exist", exist);
         if (exist == false) {
-          const imgArray = images.split(",");
-          debug(imgArray);
-          const newArtist = new Artist({
+			const imageStr = images.map(img => JSON.stringify(img))
+          const artistParams = {
             spotifyUrl,
             name,
             spotifyId,
             spotifyUri,
-            images: imgArray,
-          });
+            images:imageStr,
+		  };
+		  debug("artistParams: ",artistParams)
+          const newArtist = new Artist(artistParams);
+          debug("newArtist", newArtist);
           const saveArtist = new Promise((resolve, reject) => {
             newArtist.save((error) => {
               if (error) {

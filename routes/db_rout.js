@@ -4,12 +4,12 @@ const db_ctrl = require("../controlllers/db_ctrl");
 const { artistMethods } = require("../model_methods/artist_fact");
 
 // Create routes
-router.post("/createArtist", db_ctrl.createArtist);
-router.post("/createAlbum", db_ctrl.createAlbum);
+router.post("/artist", db_ctrl.createArtist);
+router.post("/album", db_ctrl.createAlbum);
 
-router.post("/createUser", db_ctrl.createUser);
-router.post("/createTrack", db_ctrl.createTrack);
-router.post("/createPlaylist", db_ctrl.createPlaylist);
+router.post("/user", db_ctrl.createUser);
+router.post("/track", db_ctrl.createTrack);
+router.post("/playlist", db_ctrl.createPlaylist);
 
 // Get routes
 router.get("/playlist", db_ctrl.getPlaylist);
@@ -19,8 +19,8 @@ router.get("/track", db_ctrl.getTrack);
 router.get("/user", db_ctrl.getUser);
 
 // Add song to playlist
-router.put("/addToPlaylist/:playlistId", db_ctrl.addToPlaylist);
+router.put("/playlist/:playlistId/add", db_ctrl.addToPlaylist);
 // Remove song from playlist
-router.put("/removeFromPlaylist/:playlistId", db_ctrl.removeFromPlaylist);
+router.put("/playlist/:playlistId/remove", db_ctrl.removeFromPlaylist);
 
 module.exports = router;

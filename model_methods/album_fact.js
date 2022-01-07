@@ -7,24 +7,24 @@ const { artistMethods } = require("./artist_fact");
 
 exports.albumMethods = async function (spotifyId) {
   async function exists() {
-	const exists = await dbUtils.existsInDb(Album, spotifyId);
-	return exists
+    const exists = await dbUtils.existsInDb(Album, spotifyId);
+    return exists;
   }
   async function createAlbum(
-    token,
+  {  token,
     artistsId,
     spotifyUrl,
     name,
     images,
     totalTracks,
-    spotifyUri
+    spotifyUri}
   ) {
-
-    const getArtist = async (artistId) => {
+    const getArtist = async () => {
       //Compose URL
       const baseUrl = "https://api.spotify.com/v1";
       const endpoint = "/artists/";
-      const url = baseUrl + endpoint + artistId;
+      debug(artistsId);
+      const url = baseUrl + endpoint + artistsId;
       debug("getArtist url: ", url);
       debug("token: ", token);
       // Set headers
@@ -37,35 +37,37 @@ exports.albumMethods = async function (spotifyId) {
         debug("response.data %O", response.data);
         return response.data;
       } catch (error) {
-        debug("response.error %O", response.data);
-        return error;
+        debug("response.error %O", error);
+        return new Error(error.toJSON());
       }
     };
 
-    const saveArtistById = async (spotifyId) => {
+    const saveArtistById = async () => {
       debug("saveArtistById was called");
-      const artist = await getArtist(spotifyId);
+
+      const artist = await getArtist();
+      debug("saveArtist artist:", artist);
       const artistData = {
         spotifyUrl: artist.external_urls.spotify,
         name: artist.name,
         spotifyUri: artist.uri,
         images: artist.images,
-      };
-
+	  };
+	  debug("saveArtist artistData	:", artistData);
       const result = new Promise((resolve, reject) => {
-        try {
-          artistMethods(artistsId).createArtist({ artistData });
-        } catch (error) {
-          debug("saveArtist error:", error);
-          return reject(new Error(error));
-        }
-        Artist.find({ spotifyId: artistsId }).exec((err, data) => {
-          debug("saveArtist find() error", err);
-          debug("saveArtist find() data", data);
-          if (err) reject(err);
-          const id = data[0]._id;
-          resolve(id);
-        });
+        
+		artistMethods(artistsId).createArtist(artistData)
+			.then( ()=>{
+        		Artist.find({ spotifyId: artistsId }).exec((err, data) => {
+					debug("saveArtist find() error", err);
+					debug("saveArtist find() data", data);
+					if (err) 
+						return reject(err);
+					const id = data[0]._id;
+					resolve(id);
+				});
+			})
+			.catch( error => reject(new Error(error)) )
       });
       result
         .then((id) => debug("result data: ", id))
@@ -80,7 +82,7 @@ exports.albumMethods = async function (spotifyId) {
         if (!exist) {
           debug("Save flow: exist: ", exist);
           try {
-            const artists = await saveArtistById(artistsId);
+            const artists = await saveArtistById();
             const newAlbum = new Album({
               artists,
               spotifyUrl,
