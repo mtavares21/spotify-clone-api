@@ -12,7 +12,7 @@ const { playlistMethods } = require("../model_methods/playlist_fact");
 
 // ----------------- GET docs -----------------------
 exports.getPlaylist = async (req, res, next) => {
-  db_utils.getFromDb(Playlist, req, res, next, "db_ctrl: GET PLAYLIST");
+  db_utils.getPlaylistFromDb(Playlist, req, res, next, "db_ctrl: GET PLAYLIST");
 };
 exports.getAlbum = async (req, res, next) => {
   db_utils.getFromDb(Album, req, res, next, "db_ctrl: GET ALBUM");
@@ -73,7 +73,7 @@ exports.createArtist = (req, res, next) => {
 exports.createTrack = async (req, res, next) => {
   const Track = await trackMethods(req.query.spotifyId);
   Track.createTrack(
-    "BQAcYMvSwZNOvDESg5OkyRTvg9HRIRTSXY6Jww1PasDCCODNd_aSJQ7DvwRKvWw2v06fPEKaWGhFv4RXKues8A4qFiJAGOQX84QP_kiXxQHSxZ4za42gNc86ZagOkwSjyaQ_v1z8yi64ewpHigeBu97yq5xz087cJ0HMt6Y",
+    req.session.token,
     req.query.album,
     req.query.artists,
     req.query.spotifyUrl,
@@ -88,6 +88,7 @@ exports.createTrack = async (req, res, next) => {
 exports.createPlaylist = async (req, res, next) => {
   const playlistInstance = await playlistMethods();
   const playlistParams = {
+    user: req.session.user,
     name: req.query.name,
     tracks: req.query.tracks ? req.query.tracks.split(",") : [],
     images: req.query.images ? req.query.images.split(",") : [],
@@ -106,7 +107,7 @@ exports.createPlaylist = async (req, res, next) => {
 exports.addToPlaylist = async (req, res, next) => {
   const Track = await trackMethods(req.query.spotifyId);
   Track.createTrack(
-    "BQCruBq_K9CM_a2XG4G9O8j-XK2MkOlxw8XXtl-9JoxFgkHZPqZaKxRI_b7cXggkA_2CubGLeHBQxuprJSaIWLtc9lbtDG4eu6e4MWFFagli0Qkju6KPgRXptM3WjN59yET06SyG0mazQKhUyDjnyU3kn10GSBjY47qP5qc",
+    req.session.token,
     req.query.album,
     req.query.artists,
     req.query.spotifyUrl,
@@ -115,7 +116,6 @@ exports.addToPlaylist = async (req, res, next) => {
     req.query.spotifyUri
   )
     .then(async (track) => {
-      debug("#track: ", track.track[0]._id);
       const playlistInstance = await playlistMethods();
       playlistInstance
         .addToPlaylist(req.params.playlistId, track.track[0]._id)

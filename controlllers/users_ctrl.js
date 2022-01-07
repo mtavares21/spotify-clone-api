@@ -8,7 +8,8 @@ const redirect_uri = "http://localhost:3000/v1/users/callback";
 
 exports.spotifyLogin = function (req, res, next) {
   const state = "myrandom0987state";
-  const scope ="user-read-playback-state,user-modify-playback-state,user-read-currently-playing,streaming,app-remote-control,user-read-playback-position,user-top-read";
+  const scope =
+    "user-read-playback-state,user-modify-playback-state,user-read-currently-playing,streaming,app-remote-control,user-read-playback-position,user-top-read";
 
   res.redirect(
     "https://accounts.spotify.com/authorize?" +
@@ -35,13 +36,14 @@ exports.spotifyCallback = function (req, res, next) {
         })
     );
   } else {
-    var authOptions = {
+    const authOptions = {
       url: "https://accounts.spotify.com/api/token",
       form: {
         code: code,
         redirect_uri: redirect_uri,
-		grant_type: "authorization_code",
-		scope: "user-read-playback-state,user-modify-playback-state,user-read-currently-playing,streaming,app-remote-control,user-read-playback-position,user-top-read"
+        grant_type: "authorization_code",
+        scope:
+          "user-read-playback-state,user-modify-playback-state,user-read-currently-playing,streaming,app-remote-control,user-read-playback-position,user-top-read",
       },
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -52,7 +54,6 @@ exports.spotifyCallback = function (req, res, next) {
           ).toString("base64"),
       },
     };
-  }
   // URL ENCODE PARAMS
   debug("callback: " + JSON.stringify(authOptions));
   params.append("code", code);
@@ -62,11 +63,26 @@ exports.spotifyCallback = function (req, res, next) {
   axios
     .post(authOptions.url, params, { headers: authOptions.headers })
     .then((response) => {
-	// SAVE TOKEN TO SESSION
+      // SAVE TOKEN TO SESSION
       req.session.token = response.data.access_token;
-	    req.session.refresh_token = response.data.refresh_token;
-	  debug(req.session)
-      res.json(response.data);
+      req.session.refresh_token = response.data.refresh_token;
+      // SAVE USER TO SESSION
+      const headers = {
+        Authorization: "Bearer " + response.data.access_token,
+        "Content-Type": "application/json",
+      };
+
+      axios
+        .get("https://api.spotify.com/v1/me", { headers })
+        .then((response) => {
+          debug(response);
+          req.session.user = response.data.id;
+
+          debug(req.session);
+          res.json(req.session);
+        })
+        .catch((error) => next(error));
     })
     .catch((error) => next(error));
+  }
 };

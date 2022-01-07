@@ -41,3 +41,9 @@ User_songs =>
 	song_id:
 	is_liked:
 }
+
+## spotify_clone
+## 	spotify_disclaimer
+		<btn onClick=goToSpotifyLogin() > spotify_login </btn>
+## spotify_login
+	store userId in session
