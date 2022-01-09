@@ -3,7 +3,8 @@ const router = express.Router();
 const userCtrl = require("../controlllers/users_ctrl")
 
 // Spotify Login
-router.get("/login", userCtrl.spotifyLogin);
+router.get("/login", userCtrl.login);
+router.get("/spotify/login", userCtrl.spotifyLogin);
 
 router.get("/callback", userCtrl.spotifyCallback);
 

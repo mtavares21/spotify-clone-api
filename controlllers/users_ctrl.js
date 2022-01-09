@@ -5,6 +5,16 @@ const SpotifyStrategy = require("passport-spotify").Strategy;
 const axios = require("axios");
 const debug = require("debug")("users_ctrl");
 
+exports.login = function (req, res) {
+  const user = req.query.user;
+  const token = req.query.token;
+  if (!!user && !!token) {
+    req.session.user = user;
+    req.session.token = token;
+  } else res.status(401).json({ message: "Auth error" });
+  next();
+};
+
 exports.spotifyLogin = function (req, res, next) {
   const state = "myrandom0987state";
   const redirect_uri = req.query.redirect_uri || process.env.REDIRECT_URI;
@@ -55,35 +65,35 @@ exports.spotifyCallback = function (req, res, next) {
           ).toString("base64"),
       },
     };
-  // URL ENCODE PARAMS
-  debug("callback: " + JSON.stringify(authOptions));
-  params.append("code", code);
-  params.append("redirect_uri", redirect_uri);
-  params.append("grant_type", "authorization_code");
-  // POST TO SPOTIFY
-  axios
-    .post(authOptions.url, params, { headers: authOptions.headers })
-    .then((response) => {
-      // SAVE TOKEN TO SESSION
-      req.session.token = response.data.access_token;
-      req.session.refresh_token = response.data.refresh_token;
-      // SAVE USER TO SESSION
-      const headers = {
-        Authorization: "Bearer " + response.data.access_token,
-        "Content-Type": "application/json",
-      };
+    // URL ENCODE PARAMS
+    debug("callback: " + JSON.stringify(authOptions));
+    params.append("code", code);
+    params.append("redirect_uri", redirect_uri);
+    params.append("grant_type", "authorization_code");
+    // POST TO SPOTIFY
+    axios
+      .post(authOptions.url, params, { headers: authOptions.headers })
+      .then((response) => {
+        // SAVE TOKEN TO SESSION
+        req.session.token = response.data.access_token;
+        req.session.refresh_token = response.data.refresh_token;
+        // SAVE USER TO SESSION
+        const headers = {
+          Authorization: "Bearer " + response.data.access_token,
+          "Content-Type": "application/json",
+        };
 
-      axios
-        .get("https://api.spotify.com/v1/me", { headers })
-        .then((response) => {
-          debug(response);
-          req.session.user = response.data.id;
+        axios
+          .get("https://api.spotify.com/v1/me", { headers })
+          .then((response) => {
+            debug(response);
+            req.session.user = response.data.id;
 
-          debug(req.session);
-          res.json(req.session);
-        })
-        .catch((error) => next(error));
-    })
-    .catch((error) => next(error));
+            debug(req.session);
+            res.json(req.session);
+          })
+          .catch((error) => next(error));
+      })
+      .catch((error) => next(error));
   }
 };
