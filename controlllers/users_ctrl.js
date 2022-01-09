@@ -10,9 +10,9 @@ exports.login = function (req, res, next) {
   const user = req.query.user;
   const token = req.query.token;
   if (!!user && !!token) {
-    req.session.user = user;
-    req.session.token = token;
-    res.json(req.session.cookie)
+    req.query.user = user;
+    req.query.token = token;
+    res.json(req.query.cookie)
   } else res.status(401).json({ message: "Auth error" });
 };
 
@@ -76,8 +76,8 @@ exports.spotifyCallback = function (req, res, next) {
       .post(authOptions.url, params, { headers: authOptions.headers })
       .then((response) => {
         // SAVE TOKEN TO SESSION
-        req.session.token = response.data.access_token;
-        req.session.refresh_token = response.data.refresh_token;
+        req.query.token = response.data.access_token;
+        req.query.refresh_token = response.data.refresh_token;
         // SAVE USER TO SESSION
         const headers = {
           Authorization: "Bearer " + response.data.access_token,
@@ -88,10 +88,10 @@ exports.spotifyCallback = function (req, res, next) {
           .get("https://api.spotify.com/v1/me", { headers })
           .then((response) => {
             debug(response);
-            req.session.user = response.data.id;
+            req.query.user = response.data.id;
 
-            debug(req.session);
-            res.json(req.session);
+            debug(req.query);
+            res.json(req.query);
           })
           .catch((error) => next(error));
       })

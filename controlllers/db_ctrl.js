@@ -41,9 +41,9 @@ exports.createUser = async (req, res, next) => {
 
 exports.createAlbum = async function (req, res, next) {
   const Album = await albumMethods(req.query.spotifyId);
-  debug("token: ", req.session.token);
+  debug("token: ", req.query.token);
   Album.createAlbum(
-    req.session.token,
+    req.query.token,
     req.query.artists,
     req.query.spotifyUrl,
     req.query.name,
@@ -73,7 +73,7 @@ exports.createArtist = (req, res, next) => {
 exports.createTrack = async (req, res, next) => {
   const Track = await trackMethods(req.query.spotifyId);
   Track.createTrack(
-    req.session.token,
+    req.query.token,
     req.query.album,
     req.query.artists,
     req.query.spotifyUrl,
@@ -88,7 +88,7 @@ exports.createTrack = async (req, res, next) => {
 exports.createPlaylist = async (req, res, next) => {
   const playlistInstance = await playlistMethods();
   const playlistParams = {
-    user: req.session.user,
+    user: req.query.user,
     name: req.query.name,
     tracks: req.query.tracks ? req.query.tracks.split(",") : [],
     images: req.query.images ? req.query.images.split(",") : [],
@@ -107,7 +107,7 @@ exports.createPlaylist = async (req, res, next) => {
 exports.addToPlaylist = async (req, res, next) => {
   const Track = await trackMethods(req.query.spotifyId);
   Track.createTrack(
-    req.session.token,
+    req.query.token,
     req.query.album,
     req.query.artists,
     req.query.spotifyUrl,

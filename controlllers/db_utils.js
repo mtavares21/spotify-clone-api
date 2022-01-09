@@ -77,12 +77,12 @@ exports.getPlaylistFromDb = async (
   if (!id) {
     Model.find({})
       .where('user')
-      .equals(req.session.user)
+      .equals(req.query.user)
       .exec((error, data) => this.callback(error, data, res, message));
   } else if (id) {
     Model.findById(id)
       .where('user')
-      .equals(req.session.user)
+      .equals(req.query.user)
       .exec((error, data) => this.callback(error, data, res, message));
   } else
     Model.find({}).exec((error, data) =>

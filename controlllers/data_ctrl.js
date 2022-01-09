@@ -9,7 +9,7 @@ exports.search = async function (req, res, next) {
   const endpoint = "/search";
   const url = baseUrl + endpoint + utils.queryToParams(req.query);
   const headers = {
-    Authorization: "Bearer " + req.session.token,
+    Authorization: "Bearer " + req.query.token,
     "Content-Type": "application/json",
   };
   // Search on spotify
@@ -33,7 +33,7 @@ exports.getAlbum = async function (req, res, next) {
 	debug("getAlbum url: " + url)
   // Set headers
   const headers = {
-    Authorization: "Bearer " + req.session.token,
+    Authorization: "Bearer " + req.query.token,
     "Content-Type": "application/json",
   };
 
@@ -57,7 +57,7 @@ exports.getAlbums = async function (req, res, next) {
 	debug("getAlbums url: " + url )
 	// Set headers
 	const headers = {
-	  Authorization: "Bearer " + req.session.token,
+	  Authorization: "Bearer " + req.query.token,
 	  "Content-Type": "application/json",
 	};
   
@@ -80,7 +80,7 @@ exports.getAlbumTracks = async function (req, res, next) {
   
 	// Set headers
 	const headers = {
-	  Authorization: "Bearer " + req.session.token,
+	  Authorization: "Bearer " + req.query.token,
 	  "Content-Type": "application/json",
 	};
   
@@ -104,7 +104,7 @@ exports.getArtist = async function (req, res, next) {
   debug("getArtist url: " + url);
   // Set headers
   const headers = {
-    Authorization: "Bearer " + req.session.token,
+    Authorization: "Bearer " + req.query.token,
     "Content-Type": "application/json",
   };
 
@@ -127,7 +127,7 @@ exports.getArtists = async function (req, res, next) {
   debug("getArtists url: " + url);
   // Set headers
   const headers = {
-    Authorization: "Bearer " + req.session.token,
+    Authorization: "Bearer " + req.query.token,
     "Content-Type": "application/json",
   };
 
@@ -154,7 +154,7 @@ const url = baseUrl + endpoint + query;
 
 // Set headers
 const headers = {
-  Authorization: "Bearer " + req.session.token,
+  Authorization: "Bearer " + req.query.token,
   "Content-Type": "application/json",
 };
 
@@ -179,7 +179,7 @@ exports.getTrack = async function (req, res, next) {
 	debug("get track:" + url)
 	// Set headers
 	const headers = {
-	  Authorization: "Bearer " + req.session.token,
+	  Authorization: "Bearer " + req.query.token,
 	  "Content-Type": "application/json",
 	};
   
@@ -201,7 +201,7 @@ exports.getTracks = async function (req, res, next) {
   
 	// Set headers
 	const headers = {
-	  Authorization: "Bearer " + req.session.token,
+	  Authorization: "Bearer " + req.query.token,
 	  "Content-Type": "application/json",
 	};
   

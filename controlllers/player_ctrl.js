@@ -10,10 +10,10 @@ async function getPlayerState(req, res, next) {
   const url = baseUrl + endpoint + query;
 
   debug("player: " + url);
-  debug("token: %O", req.session);
+  debug("token: %O", req.query);
   // Set headers
   const headers = {
-    Authorization: "Bearer " + req.session.token,
+    Authorization: "Bearer " + req.query.token,
     "Content-Type": "application/json",
   };
 
@@ -46,7 +46,7 @@ exports.getCurrTrack = async function (req, res, next) {
   debug("player: " + url);
   // Set headers
   const headers = {
-    Authorization: "Bearer " + req.session.token,
+    Authorization: "Bearer " + req.query.token,
     "Content-Type": "application/json",
   };
 
@@ -72,7 +72,7 @@ exports.play = async function (req, res, next) {
   debug("play: " + url);
   // Set headers
   const headers = {
-    Authorization: "Bearer " + req.session.token,
+    Authorization: "Bearer " + req.query.token,
     "Content-Type": "application/json",
   };
 
@@ -113,7 +113,7 @@ exports.pause = async function (req, res, next) {
   debug("pause: " + url);
   // Set headers
   const headers = {
-    Authorization: "Bearer " + req.session.token,
+    Authorization: "Bearer " + req.query.token,
     "Content-Type": "application/json",
   };
   debug("headers",headers)
@@ -135,7 +135,7 @@ exports.nextSong = async function (req, res, next) {
   debug("pause: " + url);
   // Set headers
   const headers = {
-    Authorization: "Bearer " + req.session.token,
+    Authorization: "Bearer " + req.query.token,
     "Content-Type": "application/json",
   };
   // Send request
@@ -157,7 +157,7 @@ exports.prevSong = async function (req, res, next) {
   debug("pause: " + url);
   // Set headers
   const headers = {
-    Authorization: "Bearer " + req.session.token,
+    Authorization: "Bearer " + req.query.token,
     "Content-Type": "application/json",
   };
   // Send request
@@ -180,7 +180,7 @@ exports.seekTo = async function (req, res, next) {
 
   // Set headers
   const headers = {
-    Authorization: "Bearer " + req.session.token,
+    Authorization: "Bearer " + req.query.token,
     "Content-Type": "application/json",
   };
 
@@ -203,7 +203,7 @@ exports.addToQueue = async function (req, res, next) {
   
 	// Set headers
 	const headers = {
-	  Authorization: "Bearer " + req.session.token,
+	  Authorization: "Bearer " + req.query.token,
 	  "Content-Type": "application/json",
 	};
 
@@ -227,7 +227,7 @@ exports.setVolume = async function (req, res, next){
   
 	// Set headers
 	const headers = {
-	  Authorization: "Bearer " + req.session.token,
+	  Authorization: "Bearer " + req.query.token,
 	  "Content-Type": "application/json",
 	};
 
