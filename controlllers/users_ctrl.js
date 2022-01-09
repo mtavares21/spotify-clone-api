@@ -6,13 +6,14 @@ const axios = require("axios");
 const debug = require("debug")("users_ctrl");
 
 exports.login = function (req, res, next) {
+  debug("login was called")
   const user = req.query.user;
   const token = req.query.token;
   if (!!user && !!token) {
     req.session.user = user;
     req.session.token = token;
+    res.json({status: true, message: "New session initiated"})
   } else res.status(401).json({ message: "Auth error" });
-  next();
 };
 
 exports.spotifyLogin = function (req, res, next) {
