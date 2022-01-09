@@ -35,6 +35,7 @@ const corsOptions = {
   credentials: true,
   preflightContinue: true,
   origin:true,
+  allowedHeaders:"Content-Type,Credentials,origin"
 };
 
 // Session
