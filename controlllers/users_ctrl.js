@@ -4,10 +4,10 @@ const passport = require("passport");
 const SpotifyStrategy = require("passport-spotify").Strategy;
 const axios = require("axios");
 const debug = require("debug")("users_ctrl");
-const redirect_uri = "http://localhost:3000/v1/users/callback";
 
 exports.spotifyLogin = function (req, res, next) {
   const state = "myrandom0987state";
+  const redirect_uri = req.query.redirect_uri || process.env.REDIRECT_URI;
   const scope =
     "user-read-playback-state,user-modify-playback-state,user-read-currently-playing,streaming,app-remote-control,user-read-playback-position,user-top-read";
 
@@ -17,7 +17,7 @@ exports.spotifyLogin = function (req, res, next) {
         response_type: "code",
         client_id: process.env.CLIENT_ID,
         scope: scope,
-        redirect_uri: req.query.redirect_uri,
+        redirect_uri: redirect_uri,
         state: state,
       })
   );
@@ -26,6 +26,7 @@ exports.spotifyLogin = function (req, res, next) {
 exports.spotifyCallback = function (req, res, next) {
   const code = req.query.code || null;
   const state = req.query.state || null;
+  const redirect_uri = req.query.redirect_uri || process.env.REDIRECT_URI;
   const params = new URLSearchParams();
 
   if (state === null) {
