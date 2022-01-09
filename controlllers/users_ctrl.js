@@ -12,7 +12,7 @@ exports.login = function (req, res, next) {
   if (!!user && !!token) {
     req.session.user = user;
     req.session.token = token;
-    res.json({status: true, message: "New session initiated"})
+    res.json({status: true, message: "New session initiated"}).cookie(req.session.cookie)
   } else res.status(401).json({ message: "Auth error" });
 };
 
