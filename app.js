@@ -3,12 +3,13 @@ const createError = require("http-errors");
 const express = require("express");
 const path = require("path");
 const bodyParser = require("body-parser");
-const cookieParser = require('cookie-parser')
+const cookieParser = require("cookie-parser");
 const logger = require("morgan");
-const debug = require('debug')('app')
-const session = require('express-session')
-const uuid = require('uuid');
-const MongoStore = require('connect-mongo');
+const debug = require("debug")("app");
+const session = require("express-session");
+const uuid = require("uuid");
+const MongoStore = require("connect-mongo");
+const cors = require("cors");
 
 //Import the mongoose module
 const mongoose = require("mongoose");
@@ -16,7 +17,7 @@ const mongoose = require("mongoose");
 //Set up default mongoose connection
 const mongoURL = process.env.DEV_DB || process.env.PRO_DB;
 mongoose.connect(mongoURL, { useNewUrlParser: true, useUnifiedTopology: true });
-debug("DATABASE_CONNECTION: ON")
+debug("DATABASE_CONNECTION: ON");
 
 //Get the default connection
 const db = mongoose.connection;
@@ -26,23 +27,37 @@ db.on("error", console.error.bind(console, "MongoDB connection error:"));
 
 // Initialize app
 const app = express();
+const corsOptions = {
+  origin: [
+    "http://localhost:3000/callback",
+    "http://localhost:3000",
+  ],
+  credentials: true,
+  preflightContinue: true,
+};
 
 // Session
-const mongoStore = MongoStore.create({ dbName:"dev_db", mongoUrl: mongoURL, collectionName: 'sessions' })
+const mongoStore = MongoStore.create({
+  dbName: "dev_db",
+  mongoUrl: mongoURL,
+  collectionName: "sessions",
+});
 
-app.set('trust proxy', 1);
-
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  genid: function(req) {
-    return uuid.v4() // use UUIDs for session IDs
-  },
-  resave: false,
-  saveUninitialized: true,
-  //Same as spotify token: 1 hour
-  cookie: { secure: false, maxAge: 3600000 },
-  store: mongoStore,
-}))
+app.set("trust proxy", 1);
+app.use(cors());
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    genid: function (req) {
+      return uuid.v4(); // use UUIDs for session IDs
+    },
+    resave: false,
+    saveUninitialized: true,
+    //Same as spotify token: 1 hour
+    cookie: { secure: false, maxAge: 3600000 },
+    store: mongoStore,
+  })
+);
 
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users_rout");
@@ -50,12 +65,11 @@ const dataRouter = require("./routes/data_rout");
 const playerRouter = require("./routes/player_rout");
 const dbRouter = require("./routes/db_rout");
 
-
 //app.use(cookieParser())
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "jade");
 
 app.use(logger("dev"));
 app.use(express.json());
