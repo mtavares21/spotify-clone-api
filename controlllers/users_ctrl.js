@@ -17,7 +17,7 @@ exports.spotifyLogin = function (req, res, next) {
         response_type: "code",
         client_id: process.env.CLIENT_ID,
         scope: scope,
-        redirect_uri: redirect_uri,
+        redirect_uri: req.query.redirect_uri,
         state: state,
       })
   );
