@@ -5,7 +5,7 @@ const SpotifyStrategy = require("passport-spotify").Strategy;
 const axios = require("axios");
 const debug = require("debug")("users_ctrl");
 
-exports.login = function (req, res) {
+exports.login = function (req, res, next) {
   const user = req.query.user;
   const token = req.query.token;
   if (!!user && !!token) {
