@@ -34,6 +34,7 @@ const corsOptions = {
   ],
   credentials: true,
   preflightContinue: true,
+  origin:true,
 };
 
 // Session
