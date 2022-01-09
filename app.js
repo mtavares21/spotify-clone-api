@@ -40,7 +40,7 @@ const corsOptions = {
 
 // Session
 const mongoStore = MongoStore.create({
-  dbName: "dev_db",
+  dbName: process.env.DEV_DB ? 'dev_db':'prod_db',
   mongoUrl: mongoURL,
   collectionName: "sessions",
 });
