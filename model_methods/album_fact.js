@@ -61,7 +61,7 @@ exports.albumMethods = async function (spotifyId) {
         		Artist.find({ spotifyId: artistsId }).exec((err, data) => {
 					debug("saveArtist find() error", err);
 					debug("saveArtist find() data", data);
-					if (err) 
+					if (err || data === null) 
 						return reject(err);
 					const id = data[0]._id;
 					resolve(id);
