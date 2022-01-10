@@ -72,7 +72,7 @@ exports.playlistMethods = async function () {
         return resolve(data.id);
       });
     });
-    const playMongoId = await mongoTrackId._id
+    const trackId = await mongoTrackId._id
 
     const response = new Promise((resolve, reject) => {
       Playlist.findById(playMongoId, function (err, playlist) {
@@ -84,7 +84,7 @@ exports.playlistMethods = async function () {
         const tracks = playlist.tracks;
         const totalTracks = playlist.totalTracks.length;
         // Verify if track is in the playlist
-        const removedTrack = tracks.filter((track) => !trackMongoId);
+        const removedTrack = tracks.filter((track) => !trackId);
         playlist.tracks = removedTrack;
         playlist.totalTracks = removedTrack.length;
         debug("removedTrack: ", removedTrack);
