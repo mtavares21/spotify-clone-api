@@ -31,7 +31,7 @@ exports.playlistMethods = async function () {
     const mongooseId = mongoose.Types.ObjectId(playlistId);
     const response = new Promise((resolve, reject) => {
       Playlist.findById(mongooseId, (err, playlist) => {
-        if (err || !playlist)
+        if (err || playlist=== null)
           return reject({ message: "Error accessing database", error: err });
         const tracks = playlist.tracks;
         const totalTracks = tracks.length;
