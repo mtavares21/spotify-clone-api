@@ -63,7 +63,7 @@ exports.albumMethods = async function (spotifyId) {
 					debug("saveArtist find() data", data);
 					if (err || data === null) 
 						return reject(err);
-					const id = data[0]._id;
+					const id = data[0] ? data[0]._id : new Error("id not found");
 					resolve(id);
 				});
 			})

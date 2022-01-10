@@ -64,44 +64,50 @@ exports.playlistMethods = async function () {
 
   async function removeFromPlaylist(playlistId, spotifyTrackId) {
     const playMongoId = mongoose.Types.ObjectId(playlistId);
-
-    const mongoTrackId = new Promise((reject, resolve) => {
-      Track.find({ 'spotifyId': spotifyTrackId }).exec( (err, data) => {
-        if(err || !spotifyTrackId)
-          return reject(err);
-        return resolve(data.id);
+    debug("removeFromPlaylist");
+    const mongoTrackId = new Promise((resolve, reject) => {
+      Track.find({ spotifyId: spotifyTrackId }).exec((err, data) => {
+        if (err || !spotifyTrackId) return reject(err);
+        debug(data);
+        debug(data[0]._id);
+        return resolve(data[0]._id);
       });
     });
-    const trackId = await mongoTrackId._id
-
-    const response = new Promise((resolve, reject) => {
-      Playlist.findById(playMongoId, function (err, playlist) {
-        if (err || playlist === null)
-          return reject(
-            new Error({ message: "Error accessing database", error: err })
-          );
-        //Params to update
-        const tracks = playlist.tracks;
-        const totalTracks = playlist.totalTracks.length;
-        // Verify if track is in the playlist
-        const removedTrack = tracks.filter((track) => !trackId);
-        playlist.tracks = removedTrack;
-        playlist.totalTracks = removedTrack.length;
-        debug("removedTrack: ", removedTrack);
-        debug("totalTracks: ", totalTracks);
-        playlist
-          .save()
-          .then(() => {
-            resolve({ message: "Track removed from playlist", playlist });
-          })
-          .catch((err) => {
-            reject(
+    try {
+      const trackId = await mongoTrackId;
+      debug("trackId", trackId);
+      const response = new Promise((resolve, reject) => {
+        Playlist.findById(playMongoId, function (err, playlist) {
+          if (err || playlist === null)
+            return reject(
               new Error({ message: "Error accessing database", error: err })
             );
-          });
+          //Params to update
+          const tracks = playlist.tracks;
+          const totalTracks = playlist.totalTracks.length;
+          // Verify if track is in the playlist
+          const removedTrack = tracks.filter((track) => !trackId);
+          playlist.tracks = removedTrack;
+          playlist.totalTracks = removedTrack.length;
+          debug("removedTrack: ", removedTrack);
+          debug("totalTracks: ", totalTracks);
+          playlist
+            .save()
+            .then(() => {
+              resolve({ message: "Track removed from playlist", playlist });
+            })
+            .catch((err) => {
+              reject(
+                new Error({ message: "Error accessing database", error: err })
+              );
+            });
+        });
       });
-    });
-    return response;
+      return response;
+    } catch (error) {
+      debug("error", error);
+      return new Error(error);
+    }
   }
   return { createPlaylist, addToPlaylist, removeFromPlaylist };
 };
