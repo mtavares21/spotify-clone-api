@@ -1,6 +1,7 @@
 const debug = require("debug")("playlist_fact");
 const mongoose = require("mongoose");
 const Playlist = require("../models/playlist_model");
+const Track = require("../models/track_model");
 
 exports.playlistMethods = async function () {
   async function createPlaylist(args) {
@@ -8,7 +9,7 @@ exports.playlistMethods = async function () {
     const newPlaylist = new Playlist(args);
     try {
       const queryPlaylist = await Playlist.find({ user: args.user })
-        .where('name')
+        .where("name")
         .equals(args.name);
       debug("queryPlaylist: ", !!queryPlaylist.length);
       if (!queryPlaylist.length) {
@@ -32,7 +33,9 @@ exports.playlistMethods = async function () {
     const response = new Promise((resolve, reject) => {
       Playlist.findById(mongooseId, (err, playlist) => {
         if (err || playlist === null)
-          return reject(new Error({ message: "Error accessing database", error: err }));
+          return reject(
+            new Error({ message: "Error accessing database", error: err })
+          );
         const tracks = playlist.tracks;
         const totalTracks = tracks.length;
         // Verify if track is in the playlist
@@ -47,7 +50,9 @@ exports.playlistMethods = async function () {
               resolve({ message: "Track added to playlist", playlist });
             })
             .catch((err) => {
-              reject(new Error({ message: "Error accessing database", error: err }));
+              reject(
+                new Error({ message: "Error accessing database", error: err })
+              );
             });
         } else {
           return resolve({ message: "Track already in playlist", playlist });
@@ -57,17 +62,27 @@ exports.playlistMethods = async function () {
     return response;
   }
 
-  async function removeFromPlaylist(playlistId, trackId) {
+  async function removeFromPlaylist(playlistId, spotifyTrackId) {
     const playMongoId = mongoose.Types.ObjectId(playlistId);
-    const trackMongoId = mongoose.Types.ObjectId(trackId);
+
+    const mongoTrackId = new Promise((reject, resolve) => {
+      Track.find({ 'spotifyId': spotifyTrackId }).exec( (err, data) => {
+        if(err || !spotifyTrackId)
+          return reject(err);
+        return resolve(data.id);
+      });
+    });
+    const playMongoId = await mongoTrackId._id
 
     const response = new Promise((resolve, reject) => {
       Playlist.findById(playMongoId, function (err, playlist) {
         if (err || playlist === null)
-          return reject(new Error({ message: "Error accessing database", error: err }));
+          return reject(
+            new Error({ message: "Error accessing database", error: err })
+          );
         //Params to update
         const tracks = playlist.tracks;
-        const totalTracks = playlist.totalTracks--;
+        const totalTracks = playlist.totalTracks.length;
         // Verify if track is in the playlist
         const removedTrack = tracks.filter((track) => !trackMongoId);
         playlist.tracks = removedTrack;
@@ -80,7 +95,9 @@ exports.playlistMethods = async function () {
             resolve({ message: "Track removed from playlist", playlist });
           })
           .catch((err) => {
-            reject(new Error({ message: "Error accessing database", error: err }));
+            reject(
+              new Error({ message: "Error accessing database", error: err })
+            );
           });
       });
     });
