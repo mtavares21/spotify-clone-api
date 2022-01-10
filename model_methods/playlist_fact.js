@@ -37,13 +37,15 @@ exports.playlistMethods = async function () {
             new Error({ message: "Error accessing database", error: err })
           );
         const tracks = playlist.tracks;
-        const totalTracks = tracks.length;
         // Verify if track is in the playlist
-        const isInPlaylist = !!tracks.filter(() => trackId).length;
+        const isInPlaylist =
+          tracks
+            .filter((track) => track.toString() === trackId.toString())
+            .length > 0
         if (!isInPlaylist) {
           tracks.push(trackId);
-          playlist.tracks = tracks;
-          playlist.totalTRacks = totalTracks;
+          const totalTracks = tracks.length;
+          playlist.totalTracks = totalTracks;
           playlist
             .save()
             .then((data) => {
@@ -86,10 +88,10 @@ exports.playlistMethods = async function () {
           const tracks = playlist.tracks;
           const totalTracks = playlist.totalTracks.length;
           // Verify if track is in the playlist
-          const removedTrack = tracks.filter((track) => !trackId);
-          playlist.tracks = removedTrack;
-          playlist.totalTracks = removedTrack.length;
-          debug("removedTrack: ", removedTrack);
+          const filteredTracks = tracks.filter((track) => track.toString() !== trackId.toString());
+          playlist.tracks = filteredTracks;
+          playlist.totalTracks = filteredTracks.length;
+          debug("filteresTrack: ", filteredTracks);
           debug("totalTracks: ", totalTracks);
           playlist
             .save()
