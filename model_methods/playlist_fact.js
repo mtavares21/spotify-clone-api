@@ -31,8 +31,8 @@ exports.playlistMethods = async function () {
     const mongooseId = mongoose.Types.ObjectId(playlistId);
     const response = new Promise((resolve, reject) => {
       Playlist.findById(mongooseId, (err, playlist) => {
-        if (err || playlist=== null)
-          return reject({ message: "Error accessing database", error: err });
+        if (err || playlist === null)
+          return reject(new Error({ message: "Error accessing database", error: err }));
         const tracks = playlist.tracks;
         const totalTracks = tracks.length;
         // Verify if track is in the playlist
@@ -47,7 +47,7 @@ exports.playlistMethods = async function () {
               resolve({ message: "Track added to playlist", playlist });
             })
             .catch((err) => {
-              reject({ message: "Error accessing database", error: err });
+              reject(new Error({ message: "Error accessing database", error: err }));
             });
         } else {
           return resolve({ message: "Track already in playlist", playlist });
@@ -63,8 +63,8 @@ exports.playlistMethods = async function () {
 
     const response = new Promise((resolve, reject) => {
       Playlist.findById(playMongoId, function (err, playlist) {
-        if (err)
-          return reject({ message: "Error accessing database", error: err });
+        if (err || playlist === null)
+          return reject(new Error({ message: "Error accessing database", error: err }));
         //Params to update
         const tracks = playlist.tracks;
         const totalTracks = playlist.totalTracks--;
@@ -80,7 +80,7 @@ exports.playlistMethods = async function () {
             resolve({ message: "Track removed from playlist", playlist });
           })
           .catch((err) => {
-            reject({ message: "Error accessing database", error: err });
+            reject(new Error({ message: "Error accessing database", error: err }));
           });
       });
     });
