@@ -79,6 +79,8 @@ exports.getPlaylistFromDb = async (
       .where('user')
       .equals(req.query.user)
       .populate('tracks')
+      .populate('artists')
+      .populate('album')
       .exec((error, data) => this.callback(error, data, res, message));
   } else if (id) {
     Model.findById(id)
