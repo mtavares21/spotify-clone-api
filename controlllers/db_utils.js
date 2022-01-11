@@ -3,6 +3,8 @@ const User = require("../models/user_model");
 const Track = require("../models/track_model");
 const Artist = require("../models/artist_model");
 const Album = require("../models/album_model");
+const { Mongoose } = require("mongoose");
+const mongoose = require("mongoose");
 
 // Create items in db
 
@@ -79,15 +81,29 @@ exports.getPlaylistFromDb = async (
       .where('user')
       .equals(req.query.user)
       .populate('tracks')
-      .populate('artists')
-      .populate('album')
       .exec((error, data) => this.callback(error, data, res, message));
   } else if (id) {
     Model.findById(id)
       .where('user')
       .equals(req.query.user)
       .populate('tracks')
-      .exec((error, data) => this.callback(error, data, res, message));
+      .exec(async (error, data) => {
+        const album = await Album.findById(data.album).exec((err, data)=>{
+          if(err)
+            return Promise.reject(err)
+          else return Promise.resolve(data)
+        })
+        const artists = await Artists.findById(data.artists).exec( (err,data) =>{
+          if(err)
+            return Promise.reject(err)
+          else return Promise.resolve(data)
+        })
+        Promise.all([album, artists])
+        .then((response, error) => {
+          data.album = response[0]
+          data.artists = response[1]
+          this.callback(error, data, res, message)})
+      });
   } else
     Model.find({}).populate('tracks').exec((error, data) =>
       this.callback(error, data, res, message)
