@@ -99,10 +99,11 @@ exports.getPlaylistFromDb = async (
           else return Promise.resolve(data)
         })
         Promise.all([album, artists])
-        .then((response, error) => {
-          data.album = response[0]
-          data.artists = response[1]
-          this.callback(error, data, res, message)})
+        .then((error, response) => {
+          data.album = response[0];
+          data.artists = response[1];
+          this.callback(error, data, res, message)
+        })
       });
   } else
     Model.find({}).populate('tracks').exec((error, data) =>
