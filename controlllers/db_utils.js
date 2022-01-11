@@ -78,37 +78,58 @@ exports.getPlaylistFromDb = async (
 
   if (!id) {
     Model.find({})
-      .where('user')
-      .equals(req.query.user)
-      .populate('tracks')
+      .where("user")
+      .equals(query.user)
+      .populate("tracks")
       .exec((error, data) => this.callback(error, data, res, message));
   } else if (id) {
     Model.findById(id)
-      .where('user')
-      .equals(req.query.user)
-      .populate('tracks')
+      .where("user")
+      .equals(query.user)
+      .populate("tracks")
       .exec(async (error, data) => {
-        const album = await Album.findById(data.album).exec((err, data)=>{
-          if(err)
-            return Promise.reject(err)
-          else return Promise.resolve(data)
-        })
-        const artists = await Artists.findById(data.artists).exec( (err,data) =>{
-          if(err)
-            return Promise.reject(err)
-          else return Promise.resolve(data)
-        })
-        Promise.all([album, artists])
-        .then((error, response) => {
-          data.album = response[0];
-          data.artists = response[1];
-          this.callback(error, data, res, message)
-        })
+        if (error) {
+          return this.callback.bind(error, data, res, message);
+        }
+
+        const fullTracks = data.tracks.map(async (track) => {
+          const album = new Promise((resolve, reject) => {
+            Album.findById(track.album).exec((err, data) => {
+              if (err) return reject(err);
+              else return resolve(data);
+            });
+          });
+          const artists = new Promise((resolve, reject) => {
+            Artist.findById(track.artists).exec((err, data) => {
+              if (err) return reject(err);
+              else return resolve(data);
+            });
+          });
+          debug("album", album);
+          debug("artists", artists);
+          const newTrack = new Promise((resolve, reject) => {
+            Promise.all([album, artists])
+              .then((response) => {
+                debug("promise all", response);
+                track.album = response[0];
+                track.artists = response[1];
+                return resolve(track);
+              })
+              .catch((error) => reject(error));
+          });
+          return newTrack
+        });
+        Promise.all(fullTracks)
+          .then((fullTracks) => {
+            debug("fulltracks:", fullTracks)
+            data.tracks = fullTracks;
+            this.callback(error, data, res, message);
+          })
       });
   } else
-    Model.find({}).populate('tracks').exec((error, data) =>
-      this.callback(error, data, res, message)
-    );
+    Model.find({})
+      .populate("tracks")
+      .exec((error, data) => this.callback(error, data, res, message));
 };
 
 exports.existsInDb = function (Model, spotifyId) {
