@@ -78,14 +78,16 @@ exports.getPlaylistFromDb = async (
     Model.find({})
       .where('user')
       .equals(req.query.user)
+      .populate('tracks')
       .exec((error, data) => this.callback(error, data, res, message));
   } else if (id) {
     Model.findById(id)
       .where('user')
       .equals(req.query.user)
+      .populate('tracks')
       .exec((error, data) => this.callback(error, data, res, message));
   } else
-    Model.find({}).exec((error, data) =>
+    Model.find({}).populate('tracks').exec((error, data) =>
       this.callback(error, data, res, message)
     );
 };
