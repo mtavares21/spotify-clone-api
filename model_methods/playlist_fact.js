@@ -110,6 +110,17 @@ exports.playlistMethods = async function () {
       debug("error", error);
       return new Error(error);
     }
+
+    function existsInPlaylist (spotifyId) {
+      const playMongoId = mongoose.Types.ObjectId(playlistId);
+      const response = new Promise((resolve, reject) => {
+        Playlist.findById(playMongoId).exec((err, playlist) => {
+          if (err) return reject(err);
+          const track = playlist.tracks.filter(item => item.spotifyId === spotifyid)
+          return resolve(!!track.length);
+        });
+      });
+    }
   }
   return { createPlaylist, addToPlaylist, removeFromPlaylist };
 };
