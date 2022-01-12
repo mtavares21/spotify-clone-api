@@ -115,14 +115,16 @@ exports.playlistMethods = async function () {
   function existsInPlaylist(playlistId, spotifyId) {
     const playMongoId = mongoose.Types.ObjectId(playlistId);
     const response = new Promise((resolve, reject) => {
-      Playlist.findById(playMongoId).exec((err, playlist) => {
+      Playlist.findById(playMongoId).populate('tracks').exec((err, playlist) => {
         if (err) return reject(err);
+        debug("playlist: %O",playlist)
         const track = playlist.tracks.filter(
-          (item) => item.tracks.spotifyId === spotifyId
+          (item) => item ? item.spotifyId === spotifyId : false
         );
         return resolve(!!track.length);
       });
     });
+    return response
   }
   return {
     createPlaylist,
