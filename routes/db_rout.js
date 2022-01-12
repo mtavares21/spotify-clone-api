@@ -17,7 +17,8 @@ router.get("/album", db_ctrl.getAlbum);
 router.get("/artist", db_ctrl.getArtist);
 router.get("/track", db_ctrl.getTrack);
 router.get("/user", db_ctrl.getUser);
-
+// Song in playlist ?
+router.put("/playlist/:playlistId/in", db_ctrl.isInPlaylist);
 // Add song to playlist
 router.put("/playlist/:playlistId/add", db_ctrl.addToPlaylist);
 // Remove song from playlist

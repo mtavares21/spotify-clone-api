@@ -9,6 +9,7 @@ const { artistMethods } = require("../model_methods/artist_fact");
 const { albumMethods } = require("../model_methods/album_fact");
 const { trackMethods } = require("../model_methods/track_fact");
 const { playlistMethods } = require("../model_methods/playlist_fact");
+const { db } = require("../models/user_model");
 
 // ----------------- GET docs -----------------------
 exports.getPlaylist = async (req, res, next) => {
@@ -26,6 +27,12 @@ exports.getTrack = async (req, res, next) => {
 exports.getUser = async (req, res, next) => {
   db_utils.getFromDb(User, req, res, next, "db_ctrl: GET USER");
 };
+exports.isInPlaylist = async (req, res, next) => {
+  const playlistInstance = await playlistMethods();
+  playlistInstance.existsInPlaylist(req.params.playlistId, req.query.spotifyId)
+    .then((data) => res.status(200).json(data))
+    .catch(error => res.status(404).json(error))
+}
 
 // ----------------- POST docs -----------------------
 exports.createUser = async (req, res, next) => {

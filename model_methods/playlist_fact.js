@@ -39,9 +39,8 @@ exports.playlistMethods = async function () {
         const tracks = playlist.tracks;
         // Verify if track is in the playlist
         const isInPlaylist =
-          tracks
-            .filter((track) => track.toString() === trackId.toString())
-            .length > 0
+          tracks.filter((track) => track.toString() === trackId.toString())
+            .length > 0;
         if (!isInPlaylist) {
           tracks.push(trackId);
           const totalTracks = tracks.length;
@@ -88,7 +87,9 @@ exports.playlistMethods = async function () {
           const tracks = playlist.tracks;
           const totalTracks = playlist.totalTracks.length;
           // Verify if track is in the playlist
-          const filteredTracks = tracks.filter((track) => track.toString() !== trackId.toString());
+          const filteredTracks = tracks.filter(
+            (track) => track.toString() !== trackId.toString()
+          );
           playlist.tracks = filteredTracks;
           playlist.totalTracks = filteredTracks.length;
           debug("filteresTrack: ", filteredTracks);
@@ -110,17 +111,23 @@ exports.playlistMethods = async function () {
       debug("error", error);
       return new Error(error);
     }
-
-    function existsInPlaylist (spotifyId) {
-      const playMongoId = mongoose.Types.ObjectId(playlistId);
-      const response = new Promise((resolve, reject) => {
-        Playlist.findById(playMongoId).exec((err, playlist) => {
-          if (err) return reject(err);
-          const track = playlist.tracks.filter(item => item.spotifyId === spotifyid)
-          return resolve(!!track.length);
-        });
-      });
-    }
   }
-  return { createPlaylist, addToPlaylist, removeFromPlaylist };
+  function existsInPlaylist(playlistId, spotifyId) {
+    const playMongoId = mongoose.Types.ObjectId(playlistId);
+    const response = new Promise((resolve, reject) => {
+      Playlist.findById(playMongoId).exec((err, playlist) => {
+        if (err) return reject(err);
+        const track = playlist.tracks.filter(
+          (item) => item.tracks.spotifyId === spotifyId
+        );
+        return resolve(!!track.length);
+      });
+    });
+  }
+  return {
+    createPlaylist,
+    addToPlaylist,
+    removeFromPlaylist,
+    existsInPlaylist,
+  };
 };
