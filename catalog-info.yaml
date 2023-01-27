@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: Spotify_Clone_API
+  annotations:
+    github.com/project-slug: mtavares21/Spotify_Clone_API
+spec:
+  type: other
+  lifecycle: unknown
+  owner: guests
