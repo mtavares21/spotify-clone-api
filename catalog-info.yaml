@@ -5,6 +5,6 @@ metadata:
   annotations:
     github.com/project-slug: mtavares21/Spotify_Clone_API
 spec:
-  type: other
+  type: API
   lifecycle: unknown
   owner: guests
